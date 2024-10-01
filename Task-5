@@ -1,0 +1,45 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+# URL of the e-commerce website (replace with a real URL)
+URL = "https://example-ecommerce-website.com/products"
+
+def scrape_products(url):
+    """Scrape product information from the given URL."""
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    products = []
+    
+    # Example: Modify the selectors based on the actual website's HTML structure
+    product_elements = soup.find_all('div', class_='product')
+
+    for product in product_elements:
+        name = product.find('h2', class_='product-name').text.strip()
+        price = product.find('span', class_='product-price').text.strip()
+        rating = product.find('span', class_='product-rating').text.strip()
+
+        products.append({
+            'Name': name,
+            'Price': price,
+            'Rating': rating
+        })
+    
+    return products
+
+def save_to_csv(products, filename):
+    """Save the product information to a CSV file."""
+    df = pd.DataFrame(products)
+    df.to_csv(filename, index=False)
+
+def main():
+    products = scrape_products(URL)
+    if products:
+        save_to_csv(products, 'products.csv')
+        print("Product information saved to products.csv")
+    else:
+        print("No products found.")
+
+if __name__ == "__main__":
+    main()
